@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\StatusController;
+use App\Http\Controllers\Api\UserTasksController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,8 +54,7 @@ Route::group([
     Route::put('/user-tasks/{user_task_id}', [UserTasksController::class, 'updateUserTask']);
     Route::delete('/user-tasks/{user_task_id}', [UserTasksController::class, 'destroyUserTask']);
     Route::get('/user-tasks/user/{user_id}', [UserTasksController::class, 'getUserTasksByUserId']);
-    Route::get('/user-tasks/task/{task_id}', [UserTasksController::class, 'getUserTasksByTaskId']);
-    Route::get('/user-tasks/status/{status_id}', [UserTasksController::class, 'getUserTasksByStatusId']);
     Route::put('/user-tasks/{user_task_id}/status/{status_id}', [UserTasksController::class, 'changeStatus']);
+    Route::get('/user-tasks/my-tasks', [UserTasksController::class, 'getCurrentUserTasks']);
 
 });

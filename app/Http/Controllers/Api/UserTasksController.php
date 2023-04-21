@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\UserTask;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class UserTasksController extends Controller
 {
@@ -65,22 +66,14 @@ class UserTasksController extends Controller
 
     public function getUserTasksByUserId($userId)
     {
-        $userTasks = UserTask::where('user_id', $userId)->with(['user', 'task', 'status'])->get();
+        $userTasks = UserTask::where('user_id', $userId)
+                    ->join('users', 'users.id', '=', 'user_tasks.user_id')
+                    ->join('tasks', 'tasks.id', '=', 'user_tasks.task_id')
+                    ->join('statuses', 'statuses.id', '=', 'user_tasks.status_id')
+                    ->select('users.name as user_name', 'tasks.name as task_name', 'statuses.name as status_name')
+                    ->get();
         return response()->json(['data' => $userTasks], 200);
     }
-
-    public function getUserTasksByTaskId($taskId)
-    {
-        $userTasks = UserTask::where('task_id', $taskId)->with(['user', 'task', 'status'])->get();
-        return response()->json(['data' => $userTasks], 200);
-    }
-
-    public function getUserTasksByStatusId($statusId)
-    {
-        $userTasks = UserTask::where('status_id', $statusId)->with(['user', 'task', 'status'])->get();
-        return response()->json(['data' => $userTasks], 200);
-    }
-
 
     public function changeStatus(Request $request, $userTaskId)
     {
@@ -93,4 +86,17 @@ class UserTasksController extends Controller
 
         return response()->json(['data' => $userTask], 200);
     }
+
+    public function getCurrentUserTasks()
+    {
+        $userId = Auth::id();
+        $userTasks = UserTask::where('user_id', $userId)
+                    ->join('users', 'users.id', '=', 'user_tasks.user_id')
+                    ->join('tasks', 'tasks.id', '=', 'user_tasks.task_id')
+                    ->join('statuses', 'statuses.id', '=', 'user_tasks.status_id')
+                    ->select('users.name as user_name', 'tasks.name as task_name', 'statuses.name as status_name', 'user_tasks.*')
+                    ->get();
+        return response()->json(['data' => $userTasks], 200);
+    }
+
 }
